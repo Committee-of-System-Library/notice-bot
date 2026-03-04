@@ -1,4 +1,4 @@
-name: Build & Push discord-crawler (GHCR)
+name: Build & Push notice-crawler (GHCR)
 
 on:
   workflow_run:

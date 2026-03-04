@@ -1,8 +1,8 @@
-name: Build & Push discord-be (GHCR)
+name: Build & Push notice-discord (GHCR)
 
 on:
   workflow_run:
-    workflows: ["CI - discord_bot (Gradle)"]
+    workflows: ["CI - notice_discord (Gradle)"]
     types:
       - completed
 

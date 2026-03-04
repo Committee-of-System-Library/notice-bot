@@ -1,14 +1,14 @@
-name: CI - discord_bot (Gradle)
+name: CI - notice_discord (Gradle)
 
 on:
   push:
     paths:
       - "discord_bot/**"
-      - ".github/workflows/ci-discord-bot.yml"
+      - ".github/workflows/ci-notice-discord.yml"
   pull_request:
     paths:
       - "discord_bot/**"
-      - ".github/workflows/ci-discord-bot.yml"
+      - ".github/workflows/ci-notice-discord.yml"
 
 jobs:
   build:

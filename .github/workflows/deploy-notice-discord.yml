@@ -1,0 +1,50 @@
+name: Deploy notice-discord
+
+on:
+  workflow_run:
+    workflows: ["Build & Push notice-discord (GHCR)"]
+    types:
+      - completed
+    
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  ORG: committee-of-system-library
+  IMAGE_NAME: notice-discord
+  CONT_NAME: notice_discord
+
+jobs:
+  run-docker-image:
+    runs-on: [ 'self-hosted', 'discord' ]
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login $REGISTRY -u ${{ github.actor }} --password-stdin
+          
+      - name: Getting current image name
+        id: current_img
+        run: |
+          CURRENT_IMG=$(docker inspect $CONT_NAME --format='{{.Config.Image}}' 2>/dev/null || echo "")
+          echo "image=$CURRENT_IMG" >> $GITHUB_OUTPUT
+
+      - name: Pulling latest image
+        run: docker pull $REGISTRY/$ORG/$IMAGE_NAME:latest
+
+      - name: Executing container using Docker Compose
+        run: |
+          docker compose \
+          -f ${{ secrets.SSO_DOCKERFILE_PATH }} \
+          --env-file ${{ secrets.SSO_ENV_PATH }} \
+          up -d --no-build --pull never \
+          $CONT_NAME
+
+      - name: Removing old image
+        if: success() && steps.current_img.outputs.image != ''
+        run: docker image rm ${{ steps.current_img.outputs.image }} || true
+
+      - name: Flushing docker cache
+        run: docker buildx prune -f
