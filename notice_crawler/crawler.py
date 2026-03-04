@@ -29,7 +29,7 @@ CATEGORY_ALIAS = {
     '세미나/행사': 'SEMINAR_EVENT',
     '취업정보': 'EMPLOYMENT_INFO',
     '플솝': 'PL_SOP',
-    '첨컴': 'CHEOM_COM'
+    '첨컴': 'CHEOM_COM',
 
     # 학부소식
     '학부소식': 'SCHOOL_NEWS',
