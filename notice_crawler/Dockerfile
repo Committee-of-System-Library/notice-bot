@@ -33,5 +33,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 ENV CRAWL_INTERVAL_MINUTES=5
+ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "runner.py"]
+CMD ["python","-u", "runner.py"]

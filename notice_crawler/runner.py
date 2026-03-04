@@ -1,6 +1,9 @@
 import os
 import time
 from main import run
+import traceback
+from datetime import datetime
+from main import run
 
 """
 @file runner.py
@@ -49,12 +52,16 @@ def run_all():
     run("-Employment")
 
 if __name__ == "__main__":
-    print(f"[runner] Crawl interval: {INTERVAL} minutes")
+    print(f"[runner] started at {datetime.now()} interval={INTERVAL}min", flush=True)
 
     while True:
         try:
+            print(f"[runner] tick start {datetime.now()}", flush=True)
             run_all()
-        except Exception as e:
-            print("Error occurred:", e)
+            print(f"[runner] tick done  {datetime.now()}", flush=True)
+        except Exception:
+            print("[runner] error during crawling:", flush=True)
+            traceback.print_exc()
 
+        print(f"[runner] sleep {INTERVAL}min", flush=True)
         time.sleep(INTERVAL * 60)
