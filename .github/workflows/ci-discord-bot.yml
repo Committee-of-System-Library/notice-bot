@@ -33,4 +33,4 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build project
-        run: ./gradlew clean build --no-daemon
+        run: ./gradlew clean build --no-daemon 
