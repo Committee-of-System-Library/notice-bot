@@ -154,7 +154,7 @@ class Crawler:
                 cate_text = cate_text.replace("\xa0", " ").replace("\u200b", "").replace("\ufeff", "")
                 cate_text = re.sub(r"\s+", " ", cate_text).strip()
 
-                category = CATEGORY_ALIAS[cate_text] # 각 공지에 지정되어 있는 카테고리 추출
+                category = CATEGORY_ALIAS.get(cate_text, "NORMAL")# 각 공지에 지정되어 있는 카테고리 추출
 
             else:
                 category = CATEGORY_ALIAS[type] #수정
