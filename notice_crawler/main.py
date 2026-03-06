@@ -30,6 +30,8 @@ url = os.environ['API_URL']
 noticeCnt = os.environ['NOTICE_CNT']
 recruitingCnt = os.environ['RECRUITING_CNT']
 employmentCnt = os.environ['EMPLOYMENT_CNT']
+seminarEventCnt = os.environ['SEMINAR_EVENT_CNT']
+schoolNewsCnt = os.environ['SCHOOL_NEWS_CNT']
 
 def run(typeSelect: str):
     """
@@ -62,8 +64,14 @@ def run(typeSelect: str):
         case '-Employment':
             logger.info(f"Start crawling ({typeSelect[1:]})")
             noticeList = crawler.get_all_notice(type='취업정보', noticeCnt=int(employmentCnt))
+        case '-SeminarEvent':
+            logger.info(f"Start crawling ({typeSelect[1:]})")
+            noticeList = crawler.get_all_notice(type='세미나/행사', noticeCnt=int(seminarEventCnt))
+        case '-SchoolNews': 
+            logger.info(f"Start crawling ({typeSelect[1:]})")
+            noticeList = crawler.get_all_notice(type='학부소식', noticeCnt=int(schoolNewsCnt))
         case _:
-            logger.warning("Usage: python main.py -[ Notice | Recruiting | Employment ]")
+            logger.warning("Usage: python main.py -[ Notice | Recruiting | Employment | SeminarEvent | SchoolNews ]")
             return
     logger.info(f"Finish crawling ({typeSelect[1:]})")
     
