@@ -114,7 +114,13 @@ class Crawler:
         response = requests.get(url, verify=True)
         soup = BeautifulSoup(response.text, 'html.parser')
         content = soup.select_one('#bo_v_con').get_text(strip=True).replace('\xa0', '')
-        created_time = '20' + soup.select_one('.if_date').text.replace('작성일 ', '') + ':00' 
+
+        raw_date = soup.select_one('.if_date').text.replace('작성일 ', '').strip()
+
+        if re.match(r'^\d{2}-\d{2}-\d{2} \d{2}:\d{2}$', raw_date):
+            created_time = '20' + soup.select_one('.if_date').text.replace('작성일 ', '') + ':00'
+        else:
+            created_time = raw_date + ':00'
         return content, created_time
         
     
@@ -187,6 +193,11 @@ class Crawler:
 
         logger.info(f"Start crawling {type}")
 
+        if type == "학부소식":
+            noticeList = self.__parse_school_news(noticeCnt)
+            logger.info(f"Finish crawling {type} - collected {len(noticeList)} notices")
+            return noticeList
+
         noticeList = list()
         pageNum = 1
         self.__get_max_count_of_notice_per_page(type=type) # 페이지당 최대 공지 수 업데이트
@@ -223,10 +234,91 @@ class Crawler:
             if response.status_code == 200:
                 logger.info(f"Send success - status={response.status_code}")
             else:
-                logger.error(f"Send failed - status={response.status_code}")
+                logger.error(f"Send failed - status={response.status_code}, body={response.text}")
 
             return response
         except Exception:
             logger.exception("Error while sending notice to API")
             raise
-        
+
+
+    def __parse_school_news(self, noticeCnt: int) -> list[Notice]:
+        """
+        학부소식 게시판 전용 파싱 함수
+        카드형 레이아웃(div#prs > ul > li) 게시글 목록을 수집
+        """
+        noticeList = []
+        pageNum = 1
+
+        while len(noticeList) < noticeCnt:
+            response = requests.get(URLs["학부소식"] + str(pageNum))
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            items = soup.select("div#prs > ul > li")
+            if not items:
+                logger.warning(f"No school news items found on page {pageNum}")
+                break
+
+            page_added = 0
+
+            for item in items:
+                a_tag = item.select_one("a[href*='wr_id=']")
+                title_tag = item.select_one("h4")
+
+                if not a_tag or not title_tag:
+                    continue
+
+                href = a_tag.get("href")
+                title = title_tag.get_text(" ", strip=True)
+
+                if not href or not title:
+                    continue
+
+                # 링크 정규화
+                if href.startswith("http"):
+                    link = href
+                elif href.startswith("/"):
+                    link = "https://cse.knu.ac.kr" + href
+                else:
+                    link = "https://cse.knu.ac.kr/bbs/" + href.lstrip("./")
+
+                # wr_id 추출
+                match = re.search(r"wr_id=(\d+)", link)
+                if not match:
+                    continue
+
+                num = match.group(1)
+
+                # 중복 방지
+                if any(notice.link == link for notice in noticeList):
+                    continue
+
+                try:
+                    content, created_time = self.__get_content_and_created_time_of_notice(link)
+                except Exception:
+                    logger.exception(f"Failed to fetch school news detail: {link}")
+                    continue
+
+                noticeObj = Notice(
+                    num=num,
+                    title=title,
+                    link=link,
+                    category="SCHOOL_NEWS",
+                    content=content,
+                    created_at=created_time
+                )
+                noticeList.append(noticeObj)
+                page_added += 1
+
+                logger.info(f"School news collected: {title}")
+
+                if len(noticeList) >= noticeCnt:
+                    break
+
+            if page_added == 0:
+                logger.warning(f"No new school news collected on page {pageNum}")
+                break
+
+            pageNum += 1
+
+        return noticeList

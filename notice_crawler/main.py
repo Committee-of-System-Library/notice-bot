@@ -74,8 +74,7 @@ def run(typeSelect: str):
             logger.warning("Usage: python main.py -[ Notice | Recruiting | Employment | SeminarEvent | SchoolNews ]")
             return
     logger.info(f"Finish crawling ({typeSelect[1:]})")
-    
-    
+
     response = crawler.send_notice_to_api(url, noticeList)
     logger.info(f"Finish sending ({typeSelect[1:]}) - status={response.status_code}")
     
