@@ -46,8 +46,12 @@ CRAWL_INTERVAL_MINUTES 값이 너무 짧게 설정될 경우
 """
 os.makedirs("logs", exist_ok=True)
 
-logger = logging.getLogger("crawler")
-logger.setLevel(logging.INFO)
+general_logger = logging.getLogger("crawler")
+general_logger.setLevel(logging.INFO)
+
+error_logger = logging.getLogger("crawler.error")
+error_logger.setLevel(logging.ERROR)
+
 
 formatter = logging.Formatter(
     "%(asctime)s [%(levelname)s] %(message)s"
@@ -55,7 +59,7 @@ formatter = logging.Formatter(
 
 class InfoOnlyFilter(logging.Filter):
     def filter(self, record):
-        return record.levelno == logging.INFO
+        return record.levelno in (logging.INFO, logging.ERROR)
     
 # 일반 로그
 general_handler = logging.FileHandler("logs/general.log")
@@ -68,8 +72,15 @@ error_handler = logging.FileHandler("logs/error.log")
 error_handler.setLevel(logging.ERROR)
 error_handler.setFormatter(formatter)
 
-logger.addHandler(general_handler)
-logger.addHandler(error_handler)
+
+general_logger.handlers.clear()
+error_logger.handlers.clear()
+
+general_logger.addHandler(general_handler)
+error_logger.addHandler(error_handler)
+
+general_logger.propagate=False
+error_logger.propagate=False
 
 # 크롤링 주기
 INTERVAL = int(os.getenv("CRAWL_INTERVAL_MINUTES", "5"))
@@ -82,20 +93,21 @@ def run_all():
     run("-SeminarEvent")
     run("-SchoolNews")
 
-    logger.info("Finish crawling cycle")
+    general_logger.info("Finish crawling cycle")
 
 
 if __name__ == "__main__":
-    logger.info(f"Runner started (interval={INTERVAL} minutes)")
+    general_logger.info(f"Runner started (interval={INTERVAL} minutes)")
 
     while True:
         try:
-            logger.info("Start crawling notices")
+            general_logger.info("Start crawling notices")
             run_all()
-            logger.info("Crawler tick finish")
+            general_logger.info("Crawler tick finish")
 
         except Exception:
-            logger.error("Error occurred during crawling", exc_info=True)
+            general_logger.error("Error occurred during crawling")
+            error_logger.exception("Error occurred during crawling")
 
-        logger.info(f"Sleep {INTERVAL} minutes\n")
+        general_logger.info(f"Sleep {INTERVAL} minutes\n")
         time.sleep(INTERVAL * 60)

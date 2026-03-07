@@ -76,12 +76,15 @@ def run(typeSelect: str):
     logger.info(f"Finish crawling ({typeSelect[1:]})")
 
     response = crawler.send_notice_to_api(url, noticeList)
-    logger.info(f"Finish sending ({typeSelect[1:]}) - status={response.status_code}")
+    if response.status_code == 200:
+        logger.info(f"Finish sending ({typeSelect[1:]}) - status={response.status_code}")
+    else:
+        logger.error(f"Finish sending ({typeSelect[1:]}) - status={response.status_code}")
     
 
 if __name__ == '__main__':
     if (len(sys.argv) != 2):
-        print("Usage:", sys.argv[0], "-[ Notice | Recruiting | Employment ]\n")
+        logger.warning("Usage:", sys.argv[0], "-[ Notice | Recruiting | Employment  | SeminarEvent | SchoolNews ]\n")
 
     else:
         run(sys.argv[1])

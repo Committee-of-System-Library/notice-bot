@@ -159,8 +159,6 @@ class Crawler:
 
                 category = CATEGORY_ALIAS.get(cate_text)# 각 공지에 지정되어 있는 카테고리 추출
                 
-                logger.info(f"Detected category text: {cate_text}")
-                logger.info(f"Mapped category: {category}")
                 
                 if category is None:
                     logger.warning(f"Unknown category detected: {cate_text}")
@@ -238,6 +236,7 @@ class Crawler:
 
             return response
         except Exception:
+            logger.error("Error while sending notice API")
             logger.exception("Error while sending notice to API")
             raise
 
@@ -296,6 +295,7 @@ class Crawler:
                 try:
                     content, created_time = self.__get_content_and_created_time_of_notice(link)
                 except Exception:
+                    logger.error(f"Failed to fetch school news detail: {link}")
                     logger.exception(f"Failed to fetch school news detail: {link}")
                     continue
 
@@ -309,8 +309,6 @@ class Crawler:
                 )
                 noticeList.append(noticeObj)
                 page_added += 1
-
-                logger.info(f"School news collected: {title}")
 
                 if len(noticeList) >= noticeCnt:
                     break
