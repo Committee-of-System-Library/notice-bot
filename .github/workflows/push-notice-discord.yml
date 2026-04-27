@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  ORG: committee-of-system-library
-  IMAGE_NAME: notice-discord
+  ORG: ${{ github.repository_owner }}
+  IMAGE_NAME: ${{ github.event.repository.name }}
 
 jobs:
   build-docker-image:
