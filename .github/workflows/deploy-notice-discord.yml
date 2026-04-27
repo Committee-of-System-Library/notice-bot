@@ -12,9 +12,9 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  ORG: committee-of-system-library
-  IMAGE_NAME: notice-discord
-  CONT_NAME: notice_discord
+  ORG: ${{ github.repository_owner }}
+  IMAGE_NAME: ${{ github.event.repository.name }}
+  CONT_NAME: ${{ github.event.repository.name }}
 
 jobs:
   run-docker-image:
