@@ -5,6 +5,7 @@ on:
     workflows: ["CI - notice_crawler (Python)"]
     types:
       - completed
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io

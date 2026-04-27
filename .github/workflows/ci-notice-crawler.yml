@@ -9,6 +9,7 @@ on:
     paths:
       - "notice_crawler/**"
       - ".github/workflows/ci-notice-crawler.yml"
+  workflow_dispatch:
 
 jobs:
   lint-run:

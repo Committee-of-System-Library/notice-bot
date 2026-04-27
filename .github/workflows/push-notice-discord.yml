@@ -5,7 +5,8 @@ on:
     workflows: ["CI - notice_discord (Gradle)"]
     types:
       - completed
-
+  workflow_dispatch:
+    
 env:
   REGISTRY: ghcr.io
   ORG: ${{ github.repository_owner }}

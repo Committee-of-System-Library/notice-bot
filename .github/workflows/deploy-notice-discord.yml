@@ -5,6 +5,7 @@ on:
     workflows: ["Build & Push notice-discord (GHCR)"]
     types:
       - completed
+  workflow_dispatch:
     
 permissions:
   contents: read
