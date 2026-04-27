@@ -12,7 +12,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  ORG: committee-of-system-library
+  ORG: ${{ github.repository_owner }}
   IMAGE_NAME: notice-crawler
   CONT_NAME: notice_crawler
 

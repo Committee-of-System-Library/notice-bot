@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  ORG: committee-of-system-library
+  ORG: ${{ github.repository_owner }}
   IMAGE_NAME: notice-crawler
 
 jobs:
